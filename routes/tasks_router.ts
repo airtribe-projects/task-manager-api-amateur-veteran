@@ -8,5 +8,6 @@ router.get('/:id', tasksController.getTask);
 router.post('/', tasksController.createTask);
 router.put('/:id', tasksController.updateTask);
 router.delete('/:id', tasksController.deleteTask);
+router.get('/priority/:level', tasksController.getTasksByPriority);
 
 export default router;

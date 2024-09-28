@@ -8,6 +8,7 @@ interface Task {
     title: string;
     description: string;
     completed: boolean;
+    level: string | undefined;
 }
 
 var tasksMemLoad: Task[] = [];
@@ -43,8 +44,13 @@ async function writeTasksToFile(tasks: Task[]): Promise<void> {
 }
 
 
-async function listTasks() {
-    return tasksMemLoad;
+async function listTasks(model: { completedStatus?: boolean }): Promise<Task[]> {
+    const { completedStatus } = model || {};
+    if (completedStatus !== undefined) {
+        return tasksMemLoad.filter((t) => t.completed === completedStatus);
+    }
+    const sortedTasks = tasksMemLoad.sort((a, b) => a.id - b.id); // our operations ensure id as a map to creation date technically.
+    return sortedTasks;
 }
 
 async function getTask(id: number) {
@@ -78,6 +84,25 @@ async function deleteTask(id: number) {
     await writeTasksToFile(tasksMemLoad);
 }
 
+/*
+
+    Implement filtering by completion status for GET /tasks (e.g., GET /tasks?completed=true).
+
+    Implement sorting by creation date for GET /tasks.
+
+    Add a priority attribute to tasks (low, medium, high).
+
+        Implement GET /tasks/priority/:level: Retrieve tasks by priority level.
+
+        Ensure task creation and updates support the priority field.
+
+*/
+
+async function getTasksByPriority(level: string) {
+    const tasks = tasksMemLoad.filter((t: Task) => t.level === level);
+    return tasks;
+}
+
 loadTasksFromFile();
 
 export default { 
@@ -86,4 +111,5 @@ export default {
     createTask,
     updateTask,
     deleteTask,
+    getTasksByPriority,
 };
